@@ -1,6 +1,8 @@
 from translate import Translator
 from pyalex import Works
+import re
 from pyvis.network import Network
+import requests
 
 TRADUCTOR = Translator(from_lang='es', to_lang='en')
 
@@ -21,37 +23,74 @@ def formatKeyword(keyword):
     """
     Formatea la palabra clave para que sea compatible con el API de PyAlex.
     """
+    keyword = re.sub(r'[^a-zA-Z\s]', '', keyword)    
     keyword = keyword.strip()
     keyword = keyword.lower()
     keyword = keyword.replace(" ", "-")
     return keyword
 
-def graficar_conceptos(keyword, filename):
-    palabra = keyword
-    print(f'Obteniendo conceptos para la palabra clave: {palabra}')
-    palabra = traducir_texto(palabra)
-    print(f'Palabra clave traducida: {palabra}')
-    palabra = formatKeyword(palabra)
-    print(f'Palabra clave formateada: {palabra}')
+def get_coincidenias(keyword):
+    #https://api.openalex.org/autocomplete/keywords?q=university&mailto=team@ourresearch.or
+    try:
+        respuesta = requests.get('https://api.openalex.org/autocomplete/keywords',
+                                {
+                                    "q": keyword,
+                                    "mailto": "team@ourresearch.or"
+                                })
+        respuesta.raise_for_status()
+        coincidencias = respuesta.json()['results']
+        return coincidencias
+    except requests.exceptions.RequestException as e:
+        print(f'Error al obtener coincidencias: {e}')
+        return []    
 
-    RESPONSE = Works().filter(
-        keywords={"id": palabra}
-    ).get()
+def graficar_conceptos(keywords = [], filename = ""):
 
-    print(f'Conceptos encontrados: {len(RESPONSE)}')
+    RESPONSES = []
+
+    for keyword in keywords:
+
+        if(len(RESPONSES) > 0):
+            print('Ya se han encontrado conceptos, no se continuara buscando coincidencias')
+            break
+
+        palabra = keyword
+        print(f'Obteniendo conceptos para la palabra clave: {palabra}')
+        palabra = traducir_texto(palabra)
+        print(f'Palabra clave traducida: {palabra}')
+        palabra = formatKeyword(palabra)
+        print(f'Palabra clave formateada: {palabra}')
+
+        coincidencias = get_coincidenias(palabra)
+
+        for coincidencia in coincidencias:
+            print(f'Coincidencia: {coincidencia["display_name"]}')
+            palabra = coincidencia['display_name']
+            palabra = formatKeyword(palabra)
+            print(f'Palabra clave formateada: {palabra}')
+
+            RESPONSE = Works().filter(
+                keywords={"id": palabra}
+            ).get()
+
+            print(f'Conceptos encontrados: {len(RESPONSE)}')
+
+            RESPONSES.append(RESPONSE)
 
     CONCEPTOS = []
     currentID = 0
 
-    for work in RESPONSE:
-        for concepto in work['concepts']:
-            currentID += 1
-            CONCEPTOS.append({
-                'id': currentID,
-                'display_name': concepto['display_name'],
-                'level': concepto['level'],
-                'score': concepto['score'],
-            })
+    for works in RESPONSES:
+        for work in works:
+
+            for concepto in work['concepts']:
+                currentID += 1
+                CONCEPTOS.append({
+                    'id': currentID,
+                    'display_name': concepto['display_name'],
+                    'level': concepto['level'],
+                    'score': concepto['score'],
+                })
 
     EDGES = []
 
@@ -79,7 +118,11 @@ def graficar_conceptos(keyword, filename):
             value=concepto['score'],
         )
 
+    print(f"Guardando {len(CONCEPTOS)} Conceptos en: conceptos.html")
+
     net.show(f"{filename} conceptos sin relacionar.html")
+
+    print(f'Guardando {len(EDGES)} Relaciones en: conceptos relacionado.html')
 
     for edge in EDGES:
         net.add_edge(
@@ -88,7 +131,6 @@ def graficar_conceptos(keyword, filename):
         )
 
     net.show(f"{filename} conceptos relacionado.html")
-    print(f"{len(CONCEPTOS)} Conceptos guardados en: conceptos.html")
 
 if __name__ == "__main__":
-    graficar_conceptos("Machine Learning", "conceptos")
+    graficar_conceptos(['universidad', 'estudiantes', 'información', 'estudiante', 'actividades', 'productivo', 'compañeros', 'estudiando', 'productividad', 'Muchísimas'], "conceptos")

@@ -29,7 +29,7 @@ if __name__ == '__main__':
   obtener_tesauros(archivos['file_comentarios'])
   print(f'Tesauros guardados en: {archivos["file_comentarios"]} conteos.json')
   print('Análisis de video completado.')
-  palabra_mas_repetida = palabras_repetidas.index[0]
+  palabra_mas_repetida = palabras_repetidas.head(10).index.tolist()
   print(f'Buscando conceptos relacionados a la palabra: {palabra_mas_repetida}')
   graficar_conceptos(palabra_mas_repetida, VIDEO_ID)
   # Mover todos los archivos generados a una carpeta

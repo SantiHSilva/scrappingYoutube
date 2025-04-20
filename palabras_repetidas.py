@@ -43,6 +43,6 @@ if __name__ == '__main__':
     filename = 'Ncwi1DGAGkk comentarios.json reformateado.json'
     min_length = 10
     df = obtener_palabras_repetidas(filename, min_length)
-    # obtener la palabra más repetida
-    palabra_mas_repetida = df.index[0]
-    print(f'La palabra más repetida es: {palabra_mas_repetida}')
+    # obtener las primeras 10 palabras más repetidas
+    lista_de_palabras = df.head(10).index.tolist()
+    print(f'La palabra más repetida es: {lista_de_palabras}')
