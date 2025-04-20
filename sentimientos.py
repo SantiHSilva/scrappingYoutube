@@ -5,9 +5,9 @@ def obtener_texto_from_txt(filename):
     with open(filename, 'r', encoding='utf-8') as file:
         return json.load(file)
 
-TEXTO = obtener_texto_from_txt('1744989070 comentarios.json reformateado.json')
+def polaridad_por_palabra(filename):
+    texto = obtener_texto_from_txt(filename)
 
-def polaridad_por_palabra(texto):
     """
     Calcula la polaridad de cada palabra en el texto.
     
@@ -44,9 +44,19 @@ def polaridad_por_palabra(texto):
         resumen[score] += 1
         comentario += 1
 
-    print('Polaridades:', polaridades)
-    print('Resumen:', resumen)
+    print(f"Resumen de polaridades: {resumen}")
+    print(f"Total de palabras: {len(PALABRAS)}")
+
+    # Guardamos el resumen en un archivo JSON
+    with open(f'{filename} polaridades resumido.json', 'w', encoding='utf-8') as f:
+        json.dump(resumen, f, ensure_ascii=False, indent=4)
+
+    # Guardamos las polaridades en un archivo JSON
+    with open(f'{filename} polaridades detallado.json', 'w', encoding='utf-8') as f:
+        json.dump(polaridades, f, ensure_ascii=False, indent=4)
 
     return polaridades
 
-sentiment_score = polaridad_por_palabra(TEXTO)
+if __name__ == '__main__':
+    FILENAME = 'Ncwi1DGAGkk comentarios.json reformateado.json'
+    polaridad_por_palabra(FILENAME)

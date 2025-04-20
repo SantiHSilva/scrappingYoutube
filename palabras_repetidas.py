@@ -1,34 +1,45 @@
 import pandas as pd
 import json
 
-def obtener_texto_from_txt(filename):
+def _obtener_texto_from_txt(filename):
     with open(filename, 'r', encoding='utf-8') as file:
         return json.load(file)
 
-TEXTO = obtener_texto_from_txt('1744989070 comentarios.json reformateado.json')
-TEXTO = ' '.join(TEXTO)
+def obtener_palabras_repetidas(filename, min_length=10):
+    print(f'Buscando palabras repetidas en: {filename}, con longitud mínima de {min_length} caracteres.')
 
-lista_texto = TEXTO.split(" ")
+    TEXTO = _obtener_texto_from_txt(filename)
+    TEXTO = ' '.join(TEXTO)
 
-palabras = []
+    lista_texto = TEXTO.split(" ")
 
-for palabra in lista_texto:
-  if (len(palabra)>=10): # Filtramos palabras de 6 o más letras
-    palabras.append(palabra)
-        
-#Generamos un diccionario para contabilizar las palabras:
+    palabras = []
 
-word_count={}
+    for palabra in lista_texto:
+        if (len(palabra)>=min_length): # Filtramos palabras de 6 o más letras
+            palabras.append(palabra)
+                
+        word_count={}
 
-for palabra in palabras:
-    if palabra in word_count.keys():
-        word_count[palabra][0]+=1
-    else:
-        word_count[palabra]=[1]
+        for palabra in palabras:
+            if palabra in word_count.keys():
+                word_count[palabra][0]+=1
+            else:
+                word_count[palabra]=[1]
 
-# print(word_count)
+    df = pd.DataFrame.from_dict(word_count).transpose()
+    df.columns=["freq"]
+    df.sort_values(["freq"], ascending=False, inplace=True)
 
-df = pd.DataFrame.from_dict(word_count).transpose()
-df.columns=["freq"]
-df.sort_values(["freq"], ascending=False, inplace=True)
-print(df.head(10))
+    # Guardamos el DataFrame en un archivo CSV
+    df.to_csv(f'{filename} palabras_repetidas.csv', index=True, header=True)
+
+    print(f"Palabras repetidas guardadas en: {filename} palabras_repetidas.csv")
+    print(f"Total de palabras: {len(df)}")
+
+    return df
+
+if __name__ == '__main__':
+    filename = 'Ncwi1DGAGkk comentarios.json reformateado.json'
+    min_length = 10
+    obtener_palabras_repetidas(filename, min_length)

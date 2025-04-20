@@ -12,14 +12,6 @@ def obtener_texto_from_txt(filename):
     with open(filename, 'r', encoding='utf-8') as file:
         return json.load(file) 
 
-TEXTO = obtener_texto_from_txt('1744989070 comentarios.json reformateado.json')
-TEXTO = ' '.join(TEXTO)
-
-# Preprocesamiento
-stop_words = set(stopwords.words('spanish'))
-tokens = word_tokenize(TEXTO.lower())
-filtered_tokens = [word for word in tokens if word.isalpha() and word not in stop_words]
-
 # Palabras clave
 tesauros = [
     {
@@ -136,9 +128,20 @@ def mostrar_conteos(conteos):
 		for palabra, cantidad in conteo.most_common(10):
 			print(f"{palabra}: {cantidad}")
 
-# Graficar los conteos
+def guardar_conteos(conteos, filename):
+	with open(f'{filename} conteos.json', 'w', encoding='utf-8') as f:
+		json.dump(conteos, f, ensure_ascii=False, indent=4)
 
-if __name__ == "__main__":
+def obtener_tesauros(filename):
+	TEXTO = obtener_texto_from_txt(filename)
+	TEXTO = ' '.join(TEXTO)
+
+	stop_words = set(stopwords.words('spanish'))
+	tokens = word_tokenize(TEXTO.lower())
+	filtered_tokens = [word for word in tokens if word.isalpha() and word not in stop_words]
 	conteos = contar_palabras_clave(tesauros, filtered_tokens)
 	mostrar_conteos(conteos)
-	# graficar_conteos_arbol(conteos)
+	guardar_conteos(conteos, filename)
+
+if __name__ == "__main__":
+	obtener_tesauros('Ncwi1DGAGkk comentarios.json reformateado.json')

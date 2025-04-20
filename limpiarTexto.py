@@ -1,8 +1,6 @@
 import json
 import re
 
-ARCHIVO = "1744989070 comentarios.json"
-LISTA_DE_EXCLUSION_ARCHIVO = "1744989070 usuarios.json"
 REEMPLAZOS = {
     "á": "a",
     "é": "e",
@@ -22,26 +20,14 @@ REEMPLAZOS = {
     "\n": " ",
 }
 
-def limpiar_texto(texto):
+def _limpiar_texto(texto):
     texto = texto.lower()
     texto = ''.join(e for e in texto if e.isalnum() or e.isspace())
     for clave, valor in REEMPLAZOS.items():
         texto = texto.replace(clave, valor)
     return texto
 
-with open(ARCHIVO, 'r', encoding='utf-8') as f:
-    comentarios = json.load(f)
-    NUEVOS_COMENTARIOS = []
-    for comentario in comentarios:
-        filtrado = limpiar_texto(comentario)
-        NUEVOS_COMENTARIOS.append(filtrado)
-    comentarios = NUEVOS_COMENTARIOS
-
-with open(LISTA_DE_EXCLUSION_ARCHIVO, 'r', encoding='utf-8') as f:
-    lista_de_exclusion = json.load(f)
-    lista_de_exclusion = [limpiar_texto(usuario) for usuario in lista_de_exclusion]
-
-def reemplazar_usuarios(comentarios, lista_de_exclusion):
+def _reemplazar_usuarios(comentarios, lista_de_exclusion):
     NUEVOS_COMENTARIOS = []
     for comentario in comentarios:
         for usuario in lista_de_exclusion:
@@ -49,9 +35,7 @@ def reemplazar_usuarios(comentarios, lista_de_exclusion):
         NUEVOS_COMENTARIOS.append(comentario)
     return NUEVOS_COMENTARIOS
 
-NUEVOS_COMENTARIOS = reemplazar_usuarios(comentarios, lista_de_exclusion)
-
-def trim_and_filter_comments(nuevos_comentarios):
+def _trim_and_filter_comments(nuevos_comentarios):
     # strip y remover vacíos
     NUEVOS_COMENTARIOS = []
     for comentario in nuevos_comentarios:
@@ -64,8 +48,31 @@ def trim_and_filter_comments(nuevos_comentarios):
             NUEVOS_COMENTARIOS.append(comentario)
     return NUEVOS_COMENTARIOS
 
-NUEVOS_COMENTARIOS = trim_and_filter_comments(NUEVOS_COMENTARIOS)
+def limpiar_texto(archivo, lista_exclusion):
+    with open(archivo, 'r', encoding='utf-8') as f:
+        comentarios = json.load(f)
+        NUEVOS_COMENTARIOS = []
+        for comentario in comentarios:
+            filtrado = _limpiar_texto(comentario)
+            NUEVOS_COMENTARIOS.append(filtrado)
+        comentarios = NUEVOS_COMENTARIOS
 
-# Guardamos los resultados en un archivo JSON
-with open(f'{ARCHIVO} reformateado.json', 'w', encoding='utf-8') as f:
-    json.dump(NUEVOS_COMENTARIOS, f, ensure_ascii=False, indent=4)
+    with open(lista_exclusion, 'r', encoding='utf-8') as f:
+        lista_de_exclusion = json.load(f)
+        lista_de_exclusion = [_limpiar_texto(usuario) for usuario in lista_de_exclusion]
+
+    NUEVOS_COMENTARIOS = _reemplazar_usuarios(comentarios, lista_de_exclusion)
+    NUEVOS_COMENTARIOS = _trim_and_filter_comments(NUEVOS_COMENTARIOS)
+
+    # Guardamos los resultados en un archivo JSON
+    with open(f'{archivo} reformateado.json', 'w', encoding='utf-8') as f:
+        json.dump(NUEVOS_COMENTARIOS, f, ensure_ascii=False, indent=4)
+
+    return NUEVOS_COMENTARIOS
+
+if __name__ == '__main__':
+    ARCHIVO = "Ncwi1DGAGkk comentarios.json"
+    LISTA_DE_EXCLUSION_ARCHIVO = "Ncwi1DGAGkk usuarios.json"
+    NUEVOS_COMENTARIOS = limpiar_texto(ARCHIVO, LISTA_DE_EXCLUSION_ARCHIVO)
+    print(f"Texto limpio guardado en: {ARCHIVO} reformateado.json")
+    print(f"Total de comentarios: {len(NUEVOS_COMENTARIOS)}")
