@@ -2,3 +2,6 @@ google-api-python-client
 python-dotenv
 pandas
 textblob
+translate
+pyalex
+pyvis
