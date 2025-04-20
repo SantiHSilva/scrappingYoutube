@@ -3,6 +3,7 @@ from limpiarTexto import limpiar_texto
 from palabras_repetidas import obtener_palabras_repetidas
 from sentimientos import polaridad_por_palabra
 from tesauros import obtener_tesauros
+from profealex import graficar_conceptos
 from os import system
 import platform
 
@@ -28,6 +29,9 @@ if __name__ == '__main__':
   obtener_tesauros(archivos['file_comentarios'])
   print(f'Tesauros guardados en: {archivos["file_comentarios"]} conteos.json')
   print('Análisis de video completado.')
+  palabra_mas_repetida = palabras_repetidas.index[0]
+  print(f'Buscando conceptos relacionados a la palabra: {palabra_mas_repetida}')
+  graficar_conceptos(palabra_mas_repetida, VIDEO_ID)
   # Mover todos los archivos generados a una carpeta
   # con el nombre del video
   # Crear carpeta si no existe
@@ -49,5 +53,7 @@ if __name__ == '__main__':
   shutil.move(f'{archivos["file_comentarios"]} polaridades detallado.json', carpeta)
   shutil.move(f'{archivos["file_comentarios"]} polaridades resumido.json', carpeta)
   shutil.move(f'{VIDEO_ID} request_log.json', carpeta)
+  shutil.move(f'{VIDEO_ID} conceptos relacionado.html', carpeta)
+  shutil.move(f'{VIDEO_ID} conceptos sin relacionar.html', carpeta)
   print(f'Archivos guardados en: {carpeta}')
   print('Fin del programa.')
