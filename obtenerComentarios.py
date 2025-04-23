@@ -8,8 +8,8 @@ load_dotenv()
 KEY = os.getenv('YOUTUBE_KEY')
 API_VERSION = 'v3'
 YOUTUBE = build('youtube', API_VERSION, developerKey=KEY)
-MAX_RESULTS = 100
 
+MAX_RESULTS = 100 # Máximo permitido por la API
 def obtener_comentarios(VIDEO_ID):
   comentarios = YOUTUBE.commentThreads()
   request = comentarios.list(
@@ -19,8 +19,8 @@ def obtener_comentarios(VIDEO_ID):
   )
 
   RESULTADOS = [] # Lista para almacenar los resultados
-  REQUEST_LOG = []
-  USUARIOS = []
+  REQUEST_LOG = [] # Peticiones almacenadas
+  USUARIOS = [] # Usuarios que comentaron, para eliminarlos después.
 
   while request is not None:
     pagina = request.execute()

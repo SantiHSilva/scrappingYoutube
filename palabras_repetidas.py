@@ -2,14 +2,14 @@ import pandas as pd
 import json
 import matplotlib.pyplot as plt
 
-def _obtener_texto_from_txt(filename):
+def _obtener_texto_from_json(filename):
     with open(filename, 'r', encoding='utf-8') as file:
         return json.load(file)
 
 def obtener_palabras_repetidas(filename, min_length=10):
     print(f'Buscando palabras repetidas en: {filename}, con longitud mínima de {min_length} caracteres.')
 
-    TEXTO = _obtener_texto_from_txt(filename)
+    TEXTO = _obtener_texto_from_json(filename)
     TEXTO = ' '.join(TEXTO)
 
     lista_texto = TEXTO.split(" ")
@@ -17,7 +17,7 @@ def obtener_palabras_repetidas(filename, min_length=10):
     palabras = []
 
     for palabra in lista_texto:
-        if (len(palabra)>=min_length): # Filtramos palabras de 6 o más letras
+        if (len(palabra)>=min_length):
             palabras.append(palabra)
                 
         word_count={}
@@ -38,7 +38,7 @@ def obtener_palabras_repetidas(filename, min_length=10):
     print(f"Palabras repetidas guardadas en: {filename} palabras_repetidas.csv")
     print(f"Total de palabras: {len(df)}")
 
-# Obtener las 10 palabras más repetidas
+    # Obtener las 10 palabras más repetidas
     top_10 = df.head(10)
     
     # Crear la gráfica

@@ -1,16 +1,16 @@
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-from collections import Counter
-from nltk import download
-import json
-import matplotlib.pyplot as plt
-import os
+from nltk.tokenize import word_tokenize # Tokenizador de palabras, separar texto en palabras
+from nltk.corpus import stopwords # Lista de palabras vacías (stopwords)
+from collections import Counter # Contador de palabras
+from nltk import download # Descargar recursos de NLTK
+import json # Librería para trabajar con JSON
+import matplotlib.pyplot as plt # Librería para graficar
+import os # Librería para trabajar con archivos y directorios
 
 # Descargar recursos de NLTK
 download('stopwords')
 download('punkt_tab')
 
-def obtener_texto_from_txt(filename):
+def obtener_texto_from_json(filename):
     with open(filename, 'r', encoding='utf-8') as file:
         return json.load(file) 
 
@@ -116,8 +116,6 @@ tesauros = [
 		}
 ]
 
-# keyword_counts = Counter([word for word in filtered_tokens if word in keywords])
-
 def contar_palabras_clave(tesauros, tokens):
 	conteos = {}
 	for tesauro in tesauros:
@@ -135,7 +133,7 @@ def guardar_conteos(conteos, filename):
 		json.dump(conteos, f, ensure_ascii=False, indent=4)
 
 def obtener_tesauros(filename):
-	TEXTO = obtener_texto_from_txt(filename)
+	TEXTO = obtener_texto_from_json(filename)
 	TEXTO = ' '.join(TEXTO)
 
 	stop_words = set(stopwords.words('spanish'))
@@ -177,4 +175,4 @@ def generar_graficas(conteos, filename_base):
         print(f"Gráfica guardada: {ruta_completa}")
 
 if __name__ == "__main__":
-	obtener_tesauros('Ncwi1DGAGkk comentarios.json reformateado.json')
+	obtener_tesauros('./Ncwi1DGAGkk/Ncwi1DGAGkk comentarios.json reformateado.json')

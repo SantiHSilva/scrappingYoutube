@@ -64,11 +64,13 @@ def limpiar_texto(archivo, lista_exclusion):
     NUEVOS_COMENTARIOS = _reemplazar_usuarios(comentarios, lista_de_exclusion)
     NUEVOS_COMENTARIOS = _trim_and_filter_comments(NUEVOS_COMENTARIOS)
 
+    FILE = f'{archivo} reformateado.json'
+
     # Guardamos los resultados en un archivo JSON
-    with open(f'{archivo} reformateado.json', 'w', encoding='utf-8') as f:
+    with open(FILE, 'w', encoding='utf-8') as f:
         json.dump(NUEVOS_COMENTARIOS, f, ensure_ascii=False, indent=4)
 
-    return NUEVOS_COMENTARIOS
+    return FILE
 
 if __name__ == '__main__':
     ARCHIVO = "Ncwi1DGAGkk comentarios.json"

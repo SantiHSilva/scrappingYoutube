@@ -1,8 +1,8 @@
-google-api-python-client
-python-dotenv
-pandas
-textblob
-translate
-pyalex
-pyvis
-matplotlib
+google-api-python-client # Conexión a Youtube, especificamente a CommentsThreads
+python-dotenv # Carga de variables de entorno
+pandas # Manejo de datos
+textblob # Análisis de sentimientos
+translate # Traducción de texto
+pyalex # Análisis de texto con OpenAlex
+pyvis # Visualización de datos
+matplotlib # Visualización de datos
