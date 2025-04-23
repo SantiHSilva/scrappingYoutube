@@ -31,7 +31,7 @@ if __name__ == '__main__':
   print('Análisis de video completado.')
   palabra_mas_repetida = palabras_repetidas.head(10).index.tolist()
   print(f'Buscando conceptos relacionados a la palabra: {palabra_mas_repetida}')
-  graficar_conceptos(palabra_mas_repetida, VIDEO_ID)
+  PALABRA_ELEGIDA = graficar_conceptos(palabra_mas_repetida, VIDEO_ID)
   # Mover todos los archivos generados a una carpeta
   # con el nombre del video
   # Crear carpeta si no existe
@@ -53,7 +53,7 @@ if __name__ == '__main__':
   shutil.move(f'{archivos["file_comentarios"]} polaridades detallado.json', carpeta)
   shutil.move(f'{archivos["file_comentarios"]} polaridades resumido.json', carpeta)
   shutil.move(f'{VIDEO_ID} request_log.json', carpeta)
-  shutil.move(f'{VIDEO_ID} conceptos relacionado.html', carpeta)
-  shutil.move(f'{VIDEO_ID} conceptos sin relacionar.html', carpeta)
+  shutil.move(f'{VIDEO_ID} conceptos {PALABRA_ELEGIDA} relacionado.html', carpeta)
+  shutil.move(f'{VIDEO_ID} conceptos {PALABRA_ELEGIDA} sin relacionar.html', carpeta)
   print(f'Archivos guardados en: {carpeta}')
   print('Fin del programa.')

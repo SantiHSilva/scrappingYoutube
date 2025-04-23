@@ -47,6 +47,7 @@ def get_coincidenias(keyword):
 def graficar_conceptos(keywords = [], filename = ""):
 
     RESPONSES = []
+    PALABRA_ELEGIDA = None
 
     for keyword in keywords:
 
@@ -60,6 +61,10 @@ def graficar_conceptos(keywords = [], filename = ""):
         print(f'Palabra clave traducida: {palabra}')
         palabra = formatKeyword(palabra)
         print(f'Palabra clave formateada: {palabra}')
+
+        if not palabra:
+            print('No se pudo traducir la palabra clave')
+            continue
 
         coincidencias = get_coincidenias(palabra)
 
@@ -75,14 +80,16 @@ def graficar_conceptos(keywords = [], filename = ""):
 
             print(f'Conceptos encontrados: {len(RESPONSE)}')
 
-            RESPONSES.append(RESPONSE)
+            if(len(RESPONSE) > 0):
+                RESPONSES.append(RESPONSE)
+                PALABRA_ELEGIDA = palabra
+                break
 
     CONCEPTOS = []
     currentID = 0
 
     for works in RESPONSES:
         for work in works:
-
             for concepto in work['concepts']:
                 currentID += 1
                 CONCEPTOS.append({
@@ -91,6 +98,19 @@ def graficar_conceptos(keywords = [], filename = ""):
                     'level': concepto['level'],
                     'score': concepto['score'],
                 })
+
+    # si el display_name esta repetido, sumar el score
+    NEW_CONCEPTOS = []
+
+    for concepto in CONCEPTOS:
+        if concepto['display_name'] not in [c['display_name'] for c in NEW_CONCEPTOS]:
+            NEW_CONCEPTOS.append(concepto)
+        else:
+            for c in NEW_CONCEPTOS:
+                if c['display_name'] == concepto['display_name']:
+                    c['score'] += concepto['score']
+
+    CONCEPTOS = NEW_CONCEPTOS
 
     EDGES = []
 
@@ -120,7 +140,7 @@ def graficar_conceptos(keywords = [], filename = ""):
 
     print(f"Guardando {len(CONCEPTOS)} Conceptos en: conceptos.html")
 
-    net.show(f"{filename} conceptos sin relacionar.html")
+    net.show(f"{filename} conceptos {PALABRA_ELEGIDA} sin relacionar.html")
 
     print(f'Guardando {len(EDGES)} Relaciones en: conceptos relacionado.html')
 
@@ -130,7 +150,9 @@ def graficar_conceptos(keywords = [], filename = ""):
             edge['to'],
         )
 
-    net.show(f"{filename} conceptos relacionado.html")
+    net.show(f"{filename} conceptos {PALABRA_ELEGIDA} relacionado.html")
+
+    return PALABRA_ELEGIDA
 
 if __name__ == "__main__":
-    graficar_conceptos(['universidad', 'estudiantes', 'información', 'estudiante', 'actividades', 'productivo', 'compañeros', 'estudiando', 'productividad', 'Muchísimas'], "conceptos")
+    graficar_conceptos(['Tourism'], "conceptos")
