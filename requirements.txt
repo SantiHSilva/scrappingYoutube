@@ -5,3 +5,4 @@ textblob
 translate
 pyalex
 pyvis
+matplotlib

@@ -3,6 +3,8 @@ from nltk.corpus import stopwords
 from collections import Counter
 from nltk import download
 import json
+import matplotlib.pyplot as plt
+import os
 
 # Descargar recursos de NLTK
 download('stopwords')
@@ -142,6 +144,37 @@ def obtener_tesauros(filename):
 	conteos = contar_palabras_clave(tesauros, filtered_tokens)
 	mostrar_conteos(conteos)
 	guardar_conteos(conteos, filename)
+	generar_graficas(conteos, filename)
+
+def generar_graficas(conteos, filename_base):
+    # Crear directorio para guardar las gráficas si no existe
+    if not os.path.exists('graficas_tesauros'):
+        os.makedirs('graficas_tesauros')
+    
+    for nombre, conteo in conteos.items():
+        if not conteo:  # Si no hay palabras para este tesauro, saltar
+            continue
+            
+        # Obtener las palabras y sus frecuencias
+        palabras = [item[0] for item in conteo.most_common()]
+        frecuencias = [item[1] for item in conteo.most_common()]
+        
+        # Crear la gráfica
+        plt.figure(figsize=(12, 6))
+        plt.bar(palabras, frecuencias)
+        plt.title(f'Frecuencia de palabras clave - {nombre}')
+        plt.xlabel('Palabras clave')
+        plt.ylabel('Frecuencia')
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+        
+        # Guardar la gráfica
+        nombre_archivo = f"{filename_base} tesauro {nombre}.png".replace('/', '-')  # Evitar problemas con /
+        ruta_completa = os.path.join('graficas_tesauros', nombre_archivo)
+        plt.savefig(ruta_completa)
+        plt.close()
+        
+        print(f"Gráfica guardada: {ruta_completa}")
 
 if __name__ == "__main__":
 	obtener_tesauros('Ncwi1DGAGkk comentarios.json reformateado.json')
