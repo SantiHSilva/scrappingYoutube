@@ -3,6 +3,8 @@ from pyalex import Works
 import re
 from pyvis.network import Network
 import requests
+import random
+import json
 
 TRADUCTOR = Translator(from_lang='es', to_lang='en')
 
@@ -88,6 +90,18 @@ def graficar_conceptos(keywords = [], filename = ""):
     CONCEPTOS = []
     currentID = 0
 
+    def colores_por_nivel(CONCEPTOS):
+        COLORES_POR_NIVEL = []
+        for concepto in CONCEPTOS:
+            if concepto['level'] not in [c['level'] for c in COLORES_POR_NIVEL]:
+                color = "#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
+                COLORES_POR_NIVEL.append({
+                    'level': concepto['level'],
+                    'color': color,
+                })
+
+        return COLORES_POR_NIVEL
+    
     for works in RESPONSES:
         for work in works:
             for concepto in work['concepts']:
@@ -98,6 +112,8 @@ def graficar_conceptos(keywords = [], filename = ""):
                     'level': concepto['level'],
                     'score': concepto['score'],
                 })
+
+    COLORES = colores_por_nivel(CONCEPTOS)
 
     # si el display_name esta repetido, sumar el score
     NEW_CONCEPTOS = []
@@ -136,6 +152,7 @@ def graficar_conceptos(keywords = [], filename = ""):
             concepto['id'],
             label=concepto['display_name'],
             value=concepto['score'],
+            color=next((color['color'] for color in COLORES if color['level'] == concepto['level']), '#97c2fc'),
         )
 
     print(f"Guardando {len(CONCEPTOS)} Conceptos en: conceptos.html")
@@ -151,6 +168,9 @@ def graficar_conceptos(keywords = [], filename = ""):
         )
 
     net.show(f"{filename} conceptos {PALABRA_ELEGIDA} relacionado.html")
+
+    with open(f"{filename} conceptos {PALABRA_ELEGIDA} logs.json", "w") as f:
+        json.dump(CONCEPTOS, f, indent=2)
 
     return PALABRA_ELEGIDA
 

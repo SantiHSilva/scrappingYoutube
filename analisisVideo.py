@@ -55,5 +55,6 @@ if __name__ == '__main__':
   shutil.move(f'{VIDEO_ID} request_log.json', carpeta)
   shutil.move(f'{VIDEO_ID} conceptos {PALABRA_ELEGIDA} relacionado.html', carpeta)
   shutil.move(f'{VIDEO_ID} conceptos {PALABRA_ELEGIDA} sin relacionar.html', carpeta)
+  shutil.move(f'{VIDEO_ID} conceptos {PALABRA_ELEGIDA} logs.json', carpeta)
   print(f'Archivos guardados en: {carpeta}')
   print('Fin del programa.')
