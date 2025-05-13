@@ -4,15 +4,15 @@ from palabras_repetidas import obtener_palabras_repetidas
 from sentimientos import polaridad_por_palabra
 from tesauros import obtener_tesauros
 from profealex import graficar_conceptos
-from os import system
-import platform
+from fastapi import FastAPI
 
-def limpiar_pantalla():
-  system('cls' if platform.system() == 'Windows' else 'clear')
+app = FastAPI()
 
-if __name__ == '__main__':
-  limpiar_pantalla()
-  VIDEO_ID = input('Introduce el ID del video: ')
+@app.get("/analizar/{VIDEO_ID}")
+def analizar_video(VIDEO_ID: str):
+  return procesamiento(VIDEO_ID)
+
+def procesamiento(VIDEO_ID: str):
   archivos = obtener_comentarios(VIDEO_ID)
   print(f'Comentarios guardados en: {archivos["file_comentarios"]}')
   print(f'Usuarios guardados en: {archivos["file_usuarios"]}')
