@@ -1,10 +1,10 @@
-from translate import Translator
-from pyalex import Works
-import re
-from pyvis.network import Network
-import requests
-import random
-import json
+from translate import Translator # Traducir palabras claves
+from pyalex import Works # API de OpenAlex para la obtención de articulos
+import re # Libreria para expresiones regulares, para limpiar las palabras claves
+from pyvis.network import Network # Libreria para graficar los conceptos
+import requests # Libreria para hacer peticiones HTTP
+import random # Libreria para generar colores aleatorios
+import json # Libreria para guardar los conceptos en un archivo JSON
 
 TRADUCTOR = Translator(from_lang='es', to_lang='en')
 
@@ -22,17 +22,17 @@ def traducir_texto(texto):
 # keywords debe estar en inglés y cada espacio es un "-"
 
 def formatKeyword(keyword):
-    """
-    Formatea la palabra clave para que sea compatible con el API de PyAlex.
-    """
-    keyword = re.sub(r'[^a-zA-Z\s]', '', keyword)    
+    # Removemos caracteres que no sean letras
+    keyword = re.sub(r'[^a-zA-Z\s]', '', keyword)
+    # Removemos espacios en blanco al principio y al final
     keyword = keyword.strip()
+    # Removemos espacios en blanco entre palabras
     keyword = keyword.lower()
+    # Reemplazamos espacios en blanco por guiones
     keyword = keyword.replace(" ", "-")
     return keyword
 
 def get_coincidenias(keyword):
-    #https://api.openalex.org/autocomplete/keywords?q=university&mailto=team@ourresearch.or
     try:
         respuesta = requests.get('https://api.openalex.org/autocomplete/keywords',
                                 {
@@ -58,11 +58,8 @@ def graficar_conceptos(keywords = [], filename = ""):
             break
 
         palabra = keyword
-        print(f'Obteniendo conceptos para la palabra clave: {palabra}')
         palabra = traducir_texto(palabra)
-        print(f'Palabra clave traducida: {palabra}')
         palabra = formatKeyword(palabra)
-        print(f'Palabra clave formateada: {palabra}')
 
         if not palabra:
             print('No se pudo traducir la palabra clave')
@@ -88,7 +85,6 @@ def graficar_conceptos(keywords = [], filename = ""):
                 break
 
     CONCEPTOS = []
-    currentID = 0
 
     def colores_por_nivel(CONCEPTOS):
         COLORES_POR_NIVEL = []
@@ -102,6 +98,7 @@ def graficar_conceptos(keywords = [], filename = ""):
 
         return COLORES_POR_NIVEL
     
+    currentID = 0
     for works in RESPONSES:
         for work in works:
             for concepto in work['concepts']:
@@ -129,7 +126,6 @@ def graficar_conceptos(keywords = [], filename = ""):
     CONCEPTOS = NEW_CONCEPTOS
 
     EDGES = []
-
     # relacionar IDS si corresponden al mismo level
     # iterar 2 veces
     for concepto1 in CONCEPTOS:
