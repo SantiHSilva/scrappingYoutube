@@ -5,6 +5,8 @@ from sentimientos import polaridad_por_palabra
 from tesauros import obtener_tesauros
 from profealex import graficar_conceptos
 from fastapi import FastAPI
+import os
+import shutil
 
 app = FastAPI()
 
@@ -35,8 +37,7 @@ def procesamiento(VIDEO_ID: str):
   # Mover todos los archivos generados a una carpeta
   # con el nombre del video
   # Crear carpeta si no existe
-  import os
-  import shutil
+
   carpeta = f'{VIDEO_ID}'
   if not os.path.exists(carpeta):
     os.makedirs(carpeta)
@@ -58,6 +59,79 @@ def procesamiento(VIDEO_ID: str):
   shutil.move(f'{VIDEO_ID} request_log.json', carpeta)
   shutil.move(f'{VIDEO_ID} conceptos {PALABRA_ELEGIDA} relacionado.html', carpeta)
   shutil.move(f'{VIDEO_ID} conceptos {PALABRA_ELEGIDA} sin relacionar.html', carpeta)
-  shutil.move(f'{VIDEO_ID} conceptos {PALABRA_ELEGIDA} logs.json', carpeta)
+  shutil.move(f'{VIDEO_ID} conceptos logs.json', carpeta)
   print(f'Archivos guardados en: {carpeta}')
   print('Fin del programa.')
+  return _obtener_archivos_generados(VIDEO_ID)
+
+@app.get("/archivos/{VIDEO_ID}")
+def obtener_archivos_generados(VIDEO_ID: str):
+  return _obtener_archivos_generados(VIDEO_ID)
+
+def _obtener_archivos_generados(VIDEO_ID: str):
+  import os
+  import json
+  import csv
+
+  os.system('cls')
+
+  if not os.path.exists(VIDEO_ID):
+    return {
+      "status": False,
+      "msg": "No se encontraron archivos generados",
+    }
+
+  def _get_file(file_name):
+    # Ingresa de la carpeta VIDEO_ID
+    # y devuelve el nombre del archivo
+    # con la ruta completa
+    return os.path.join(VIDEO_ID, file_name)
+  
+  def get_file_json(file_name):
+    with open(_get_file(file_name), 'r', encoding='utf-8') as file:
+      return json.load(file)
+
+  COMENTARIOS = get_file_json(f'{VIDEO_ID} comentarios.json')
+
+  USUARIOS = get_file_json(f'{VIDEO_ID} usuarios.json')
+
+  COMENTARIOS_LIMPIOS = get_file_json(f'{VIDEO_ID} comentarios.json reformateado.json')
+
+  CONTEOS_TESAUROS = get_file_json(f'{VIDEO_ID} comentarios.json reformateado.json conteos.json')
+
+  def get_csv_to_json(file_name):
+    # Convierte el archivo csv a json
+    # y devuelve el json
+    with open(_get_file(file_name), 'r', encoding='utf-8') as file:
+      reader = csv.DictReader(file)
+      data = [row for row in reader]
+    return data
+  
+  PALABRAS_REPETIDAS = get_csv_to_json(f'{VIDEO_ID} comentarios.json reformateado.json palabras_repetidas.csv')
+
+  POLARIDAD_DETALLADA = get_file_json(f'{VIDEO_ID} comentarios.json reformateado.json polaridades detallado.json')
+
+  POLARIDAD_RESUMIDO = get_file_json(f'{VIDEO_ID} comentarios.json reformateado.json polaridades resumido.json')
+
+  CONCEPTOS_OPEN_ALEX = get_file_json(f'{VIDEO_ID} conceptos logs.json')
+
+  return {
+    "status": True,
+    "msg": "Análisis de video completado",
+    "comentarios": COMENTARIOS,
+    "usuarios": USUARIOS,
+    "comentarios_limpios": COMENTARIOS_LIMPIOS,
+    "palabras_repetidas": PALABRAS_REPETIDAS,
+    "polaridad_detallada": POLARIDAD_DETALLADA,
+    "polaridad_resumido": POLARIDAD_RESUMIDO,
+    "conteos_tesauros": CONTEOS_TESAUROS,
+    "conceptos_open_alex": CONCEPTOS_OPEN_ALEX,
+  }
+
+# if __name__ == '__main__':
+  # procesamiento('Ncwi1DGAGkk')
+  # print(obtener_archivos_generados('Ncwi1DGAGkk'))
+
+if __name__ == '__main__':
+  import uvicorn
+  uvicorn.run('analisisVideo:app', reload=True)

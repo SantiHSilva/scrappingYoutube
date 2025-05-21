@@ -165,7 +165,7 @@ def graficar_conceptos(keywords = [], filename = ""):
 
     net.show(f"{filename} conceptos {PALABRA_ELEGIDA} relacionado.html")
 
-    with open(f"{filename} conceptos {PALABRA_ELEGIDA} logs.json", "w") as f:
+    with open(f"{filename} conceptos logs.json", "w") as f:
         json.dump(CONCEPTOS, f, indent=2)
 
     return PALABRA_ELEGIDA

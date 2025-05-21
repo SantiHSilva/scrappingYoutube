@@ -1,6 +1,6 @@
-from textblob import TextBlob
-import json
-import matplotlib.pyplot as plt
+from textblob import TextBlob # Sirve para analizar el texto y obtener la polaridad
+import json # Para manejar archivos JSON
+import matplotlib.pyplot as plt # Para graficar los resultados
 
 def obtener_texto_from_txt(filename):
     with open(filename, 'r', encoding='utf-8') as file:
@@ -8,7 +8,6 @@ def obtener_texto_from_txt(filename):
 
 def polaridad_por_palabra(filename):
     texto = obtener_texto_from_txt(filename)
-
     """
     Calcula la polaridad de cada palabra en el texto.
     
@@ -25,15 +24,13 @@ def polaridad_por_palabra(filename):
         'negativo': 0,
         'neutral': 0
     }
-
-    comentario = 1
-
+    comentario = 1 # Para el registro de comentarios
     for palabra in PALABRAS:
         blob = TextBlob(palabra)
         polaridad = blob.sentiment.polarity
         
         score = ""
-
+        # Clasificamos la polaridad
         if polaridad > 0:
             score = "positivo"
         elif polaridad < 0:
@@ -41,9 +38,10 @@ def polaridad_por_palabra(filename):
         else:
             score = "neutral"
 
+        # Guardamos la polaridad en el diccionario
         polaridades[f'comentario: #{comentario}'] = f'{score} - {polaridad}'
-        resumen[score] += 1
-        comentario += 1
+        resumen[score] += 1 # Actualizamos el resumen
+        comentario += 1 # Incrementamos el contador de comentarios
 
     print(f"Resumen de polaridades: {resumen}")
     print(f"Total de palabras: {len(PALABRAS)}")
@@ -92,5 +90,5 @@ def generar_grafica_polaridad(resumen, filename):
     plt.close()
 
 if __name__ == '__main__':
-    FILENAME = 'Ncwi1DGAGkk comentarios.json reformateado.json'
+    FILENAME = './Ncwi1DGAGkk/Ncwi1DGAGkk comentarios.json reformateado.json'
     polaridad_por_palabra(FILENAME)
