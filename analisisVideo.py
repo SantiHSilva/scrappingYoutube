@@ -7,8 +7,18 @@ from profealex import graficar_conceptos
 from fastapi import FastAPI
 import os
 import shutil
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins="*",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/analizar/{VIDEO_ID}")
 def analizar_video(VIDEO_ID: str):
